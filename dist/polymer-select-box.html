@@ -1,0 +1,540 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<polymer-element name="polymer-select-box" constructor="PolymerSelectBox" tabindex="-1">
+    <template>
+        <style>
+            :host {
+                outline: none;
+            }
+            #container {
+                border: 1px solid #ddd;
+                border-radius: 2px;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                padding: 5px 8px;
+                margin: 5px;
+                position: relative;
+                outline: none;
+            }
+            #container:hover {
+                cursor: text;
+                border: 1px solid #aaa;
+            }
+            #container.focused,
+            #container.focused:hover {
+                box-shadow: inset 0 0 3px #0074d9;
+            }
+            #available,
+            #container.focused,
+            #container.focused:hover {
+                border: 1px solid #004080;
+            }
+            #input {
+                flex: 1 1;
+                border: none;
+                box-sizing: border-box;
+                display: inline-block;
+                outline: none;
+                font-size: 16px;
+                padding: 10px 0;
+                vertical-align: middle;
+            }
+            #input[readonly] {
+                text-decoration: line-through;
+            }
+            #available {
+                position: absolute;
+                left: -1px;
+                right: -1px;
+                top: 100%;
+                border-top: none;
+                border-bottom-right-radius: 2px;
+                border-bottom-left-radius: 2px;
+                padding-top: 5px;
+                z-index: 1;
+                background: #fff;
+                max-height: 36ex;
+                overflow-y: auto;
+                display: none;
+            }
+            .opened #available {
+                display: block;
+            }
+            #opener {
+                position: absolute;
+                right: 5px;
+                top: 25%;
+                cursor: pointer;
+            }
+            .choice {
+                border: 1px solid #eee;
+                border-radius: 3px;
+                display: block;
+                padding: 5px;
+                margin: 5px;
+                background: #fafafa;
+                cursor: pointer;
+            }
+            .choice.highlighted {
+                border: 1px solid #bbb;
+                background: #EBF2FC;
+            }
+            .choice:hover {
+                border: 1px solid #aaa;
+            }
+            ._empty {
+                padding: 5px;
+            }
+            .unmatched {
+                color: #e00;
+            }
+
+            .item {
+                color: #3e6d8e;
+                background: #e0eaf1;
+                border-bottom: 1px solid #b3cee1;
+                border-right: 1px solid #b3cee1;
+                padding: 3px 4px;
+                margin: 5px 8px 5px 0;
+                display: inline-block;
+                vertical-align: middle;
+                cursor: pointer;
+                border-radius: 2px;
+            }
+            .item:hover {
+                /*background: #ccc;*/
+                border-bottom: 1px solid #666;
+                border-right: 1px solid #666;
+                box-shadow: 0px 0px 3px #aaa;
+            }
+            .highlighted {
+                background: #b3cee1;
+                border-bottom: 1px solid #6c9fc6;
+                border-right: 1px solid #6c9fc6;
+            }
+            .eliminate {
+                padding: 0 3px;
+                font-size: 75%;
+                margin: 2px 0 0 2px;
+                background: #ccc;
+                color: #fff;
+                border-radius: 8px;
+                cursor: pointer;
+                display: none;
+            }
+            .eliminate:hover {
+                background: #C03434;
+            }
+            .focused .eliminate {
+                display: inline-block;
+            }
+            .item.editing {
+                padding: 1px;
+            }
+            .selectionEditor {
+                border: none;
+                border-left: 1px solid #6c9fc6;
+                border-top: 1px solid #6c9fc6;
+                outline: none;
+                padding: 3px 5px;
+            }
+        </style>
+        <div id="container" tabindex="-1"
+             class="{{ {focused: focused, opened: opened} | tokenList }} {{ _mode }}">
+            <template repeat="{{ s, i in _selected }}"><!--
+             --><div class="item {{ {highlighted: s.highlighted, editing: s.editing, last: i + 1 == _selected.length} | tokenList }} {{ s.classes }}"
+                     on-mousedown="{{ _onClickSelected }}"
+                     on-dblclick="{{ _onDoubleClickSelected }}"><!--
+                 --><template if="{{ s.editing }}"><!--
+                     --><input class="selectionEditor"
+                               type="text" value="{{ _editQuery }}" size="{{ _editQuery.length < 5 ? 1 : _editQuery.length - 2 }}"><!--
+                 --></template><!--
+                 --><template if="{{ !s.editing }}"><!--
+                        -->{{ s.label }}<!--
+                 --></template><!--
+                 --><a class="eliminate" on-mousedown="{{ _onClickEliminate }}">&#x2716;</a><!--
+             --></div><!--
+         --></template>
+            <input id="input"
+                   type="text"
+                   placeholder="{{ _selected.length ? '' : 'Type here ...' }}"
+                   value="{{ _addQuery }}"
+                   class="{{ {unmatched: query.length && _empty} | tokenList }}"
+                   readonly?="{{ _mode != 'add' }}"
+                   on-mousedown="{{ _onFocusInput }}"
+                   on-focus="{{ _onFocusInput }}"
+            >
+            <div id="available" tabindex="-1">
+                <template repeat="{{ c in _matched }}">
+                    <div class="choice {{ {highlighted: c.highlighted} | tokenList }}"
+                         on-mousedown="{{ _onClickAvailable }}">{{ c.label }}
+                    </div>
+                </template>
+                <template if="{{ _empty }}">
+                    <div class="_empty">
+                        No available choices.
+                    </div>
+                </template>
+            </div>
+            <div id="opener" on-click="{{ onClickAvailableOpener }}">&#x25BC;</div>
+        </div>
+    </template>
+
+    <script>
+    (function() {
+        var CommonMixin = {
+            _navigate: function(type, direction, start) {
+                console.info('_navigate', type, direction, start);
+
+                var pos = this[type+"FocusPos"], items = this[type];
+                if (pos === null) {
+                    pos = start || -1;
+                }
+
+                switch (direction) {
+                    case 'prev': pos--; break;
+                    case 'prev5': pos -= 5; break;
+                    case 'next5': pos += 5; break;
+                    case 'prev2': pos -= 2; break;
+                    case 'next2': pos += 2; break;
+                    case 'next': pos++; break;
+                    case 'last': pos = items.length - 1; break;
+                    case 'first': pos = 0; break;
+                }
+                if (pos < 0) {
+                    pos = 0;
+                }
+                if (pos >= items.length) {
+                    pos = items.length - 1;
+                }
+                this[type+"Focus"] = items[pos];
+                if (pos) {
+                    return pos == items.length - 1 ? 1 : 0
+                }  else {
+                    return -1
+                }
+            },
+            _updateFocus: function(name, value) {
+                this[name + 'FocusPos'] = null;
+                this[name].forEach(function(item, i) {
+                    if (item.highlighted = item === value) {
+                        this[name + 'FocusPos'] = i;
+                    }
+                }, this)
+            },
+        };
+        var SelectedBrowsingMixin = {
+            _browseEliminateHighlighted: function() {
+                if (this._selected.length) {
+                    this._selected.splice(this._selectedFocusPos, 1);
+                    this._selectedFocus = this._selected[this._selectedFocusPos] || this._selected[this._selectedFocusPos - 1];
+                }
+            },
+            _saveMatchedFocus: function() {
+                if (this._matchedFocus) {
+                    this._selectedFocus.value = this._matchedFocus.value;
+                    this._selectedFocus.label = this._matchedFocus.label;
+                    this._mode = 'browse';
+                }
+            },
+            _navigateSelected: function(direction) {
+                if (this._selected.length) {
+                    this._navigate('_selected', direction, this._selected.length);
+                }
+            },
+        }
+        var AvailableDropdownMixin = {
+            _isAvailable: function(item) {
+                return !this._selected.filter(function(i) {
+                    return !i.editing && i.value == item.value;
+                }).length;
+            },
+            _isMatch: function(item, query) {
+                return !query || !query.length || item.label.toString().indexOf(query) >= 0;
+            },
+            _filter: function(value) {
+                this._matched = this._available.filter(function(item) {
+                    item.highlighted = false;
+                    return this._isAvailable(item) && this._isMatch(item, value);
+                }, this);
+                this._empty = !this._matched.length;
+                if (this._matched.length) {
+                    this._matched[0].highlighted = true;
+                }
+            },
+            _updateAvailable: function(query) {
+                this._filter(query || this._addQuery);
+                this._navigateAvailable('first');
+            },
+            _navigateAvailable: function(direction) {
+                if (this._mode == 'browse' && this._matched < 2)
+                    return true;
+                this.opened = true;
+                this._scrollAvailable(this._navigate('_matched', direction), direction);
+            },
+
+            _addItemToSelected: function(item) {
+                if (item) {
+                    this._selected.push({value: item.value, label: item.label, query: item.value});
+                    this._addQuery = '';
+                    this._updateAvailable();
+                }
+            },
+            _scrollAvailable: function(boundary, direction) {
+                if (!boundary) {
+                    var highlighted = this.$.available.querySelector('.highlighted');
+                    if (highlighted) {
+                        highlighted.scrollIntoView(direction.indexOf('next') == 0);
+                    }
+                } else {
+                    this.$.available.scrollTop = boundary > 0 ? this.$.available.scrollHeight : 0;
+                }
+            },
+        };
+        Polymer(Platform.mixin({
+            _addQuery: "",
+            _editQuery: "",
+            opened: false,
+            focused: false,
+            _mode: null, // edit, add, browse
+            _selectedFocus: undefined,
+            _selectedFocusPos: null,
+            _matchedFocus: undefined,
+            _matchedFocusPos: null,
+            _empty: false,
+            _matched: null,
+
+            ////////////////////////////////////////
+            /////////// PUBLIC INTERFACE ///////////
+            get available() {
+                return this._available;
+            },
+            set available(choices) {
+                this._available = choices.map(function(value, i) {
+                    if (typeof value == "string") {
+                        if (!value || !value.length) {
+                            throw "Can't accept falsy value in choices list. Item " + i + ": `" + value + "`";
+                        }
+                        return {value: value, label: value};
+                    } else {
+                        return value;
+                    }
+                });
+                this._filter(this._addQuery);
+            },
+            get selected() {
+                return this._selected;
+            },
+            set selected(choices) {
+                this._selected = choices;
+            },
+            ////////////////////////////////////////
+
+            ////// event handlers //////
+            created: function() {
+                this._selected = [];
+                this._available = [];
+                this._mode = 'add';
+            },
+            attached: function() {
+                this.addEventListener('focus', this._onFocus.bind(this), true);
+                this.addEventListener('blur', this._onBlur.bind(this), true);
+                this.addEventListener('keydown', this._onKeydown.bind(this), true);
+            },
+            _modeChanged: function(oldValue, newValue) {
+                switch (newValue) {
+                    case 'edit':
+                        this.critical = true;
+                        this._addQuery = '';
+                        this._selectedFocus.editing = true;
+                        this._editQueryChanged(null, this._selectedFocus.value);
+                        this._editQuery = this._selectedFocus.value;
+                        this.async(this._focusSelectionEditor);
+                        break;
+                    case 'add':
+                        this._selectedFocus = null;
+                        this.$.input.focus();
+                        this._addQueryChanged(null, this._addQuery);
+                        break;
+                    case 'browse':
+                        this._addQuery = '';
+                        this.opened = false;
+                        this.critical = true;
+                        this.focus();
+                        this.critical = false;
+                        if (this._selectedFocus) {
+                            this._selectedFocus.editing = false;
+                        }
+                        break;
+                }
+            },
+            _focusSelectionEditor: function() {
+                var el = this.$.container.querySelector('.selectionEditor');
+                el.focus();
+                el.addEventListener('focusout', function() {
+                    this._mode = 'browse';
+                }.bind(this));
+                this.critical = false;
+            },
+
+            _addQueryChanged: function(oldValue, newValue) {
+                if (this._mode == 'add' && oldValue != newValue) {
+                    this._updateAvailable(newValue);
+                }
+            },
+            _editQueryChanged: function(oldValue, newValue) {
+                //console.log(this._mode, oldValue, newValue)
+                if (this._mode == 'edit' && oldValue != newValue) {
+                    this._updateAvailable(newValue);
+                }
+            },
+            _onFocusInput: function(e) {
+                if (!this.critical) {
+                    //console.info('_onFocusInput')
+                    this._mode = 'add';
+                    this.opened = true;
+                    this.focused = true;
+                    this._updateAvailable();
+                }
+            },
+            _onBlur: function(e) {
+                if (!this.critical) {
+                    //console.info('blur')
+                    this._selectedFocus = null;
+                    this._matchedFocus = null;
+                    this.focused = false;
+                    this.opened = false;
+                }
+            },
+            _selectedFocusChanged: function(oldValue, newValue) {
+                this._updateFocus('_selected', newValue);
+                if (oldValue) {
+                    oldValue.editing = false;
+                }
+                if (!newValue) {
+                    this._mode = 'add';
+                }
+            },
+            _matchedFocusChanged: function(oldValue, newValue) {
+                this._updateFocus('_matched', newValue);
+            },
+            _matchedChanged: function(oldValue, newValue) {
+                this._matchedFocus = newValue[0];
+            },
+            _onDoubleClickSelected: function(e) {
+                this.focus();
+                this._mode = 'edit';
+                this._selectedFocus = e.target.templateInstance.model.s;
+                e.preventDefault();
+            },
+            _onClickSelected: function(e) {
+                this.focus();
+                this._mode = 'browse';
+                this._selectedFocus = e.target.templateInstance.model.s;
+                e.preventDefault();
+            },
+            _onClickEliminate: function(e) {
+                var index = this._selected.indexOf(e.target.templateInstance.model.s);
+                if (index != -1) {
+                    this._selected.splice(index, 1);
+                }
+                this._filter(this._addQuery);
+                e.preventDefault();
+            },
+            _onClickAvailable: function(e) {
+                if (this._mode == 'edit') {
+                    this._saveMatchedFocus();
+                } else {
+                    this._addItemToSelected(e.target.templateInstance.model.c);
+                }
+                e.preventDefault();
+            },
+            _onFocus: function(e) {
+                if (!this.critical) {
+                    this._mode = 'add';
+                    if (this._mode == 'add')
+                        this.$.input.focus();
+                }
+            },
+            _keyDispatch: {
+                browse: {
+                    8: ['_browseEliminateHighlighted'],
+                    46: ['_browseEliminateHighlighted'],
+                    37: ['_navigateSelected', 'prev'],
+                    39: function() {
+                        if (this._selectedFocusPos == this._selected.length - 1) {
+                            this._mode = 'add';
+                        } else {
+                            this._navigateSelected('next');
+                        }
+                    },
+                    27: function() {
+                        this._mode = 'add';
+                    },
+                    13: function() {
+                        this._mode = 'edit';
+                    },
+                },
+                edit: {
+                    27: function(e) {
+                        this._mode = 'browse';
+                        this.focus();
+                    },
+                    13: ['_saveMatchedFocus'],
+                },
+                add: {
+                    37: function() {
+                        if (this._addQuery.length || !this._selected.length)
+                            return true;
+                        this._mode = 'browse';
+                        this._navigateSelected('prev');
+                    },
+                    13: function() {
+                        this._addItemToSelected(this._matchedFocus);
+                    },
+                    27: function() {
+                        this.opened = false;
+                    },
+                    8: function() {
+                        if (!this._addQuery.length) {
+                            this._selected.pop();
+                            this._updateAvailable();
+                        } else {
+                            return true;
+                        }
+                    }
+                },
+                36: ['_navigateAvailable', 'first'],
+                33: ['_navigateAvailable', 'prev5'],
+                38: ['_navigateAvailable', 'prev'],
+                34: ['_navigateAvailable', 'next5'],
+                40: ['_navigateAvailable', 'next'],
+                35: ['_navigateAvailable', 'last'],
+            },
+            _onKeydown: function(e) {
+                console.info(e.altGraphKey, e.metaKey, e.altKey, e.shiftKey, e.keyCode);
+                if (!e.altGraphKey && !e.metaKey && !e.altKey && !e.shiftKey) {
+                    var proceed, dispatch = this._keyDispatch[this._mode][e.keyCode] || this._keyDispatch[e.keyCode];
+                    if (dispatch) {
+                        if (typeof dispatch == 'number' || typeof dispatch == 'string') {
+                            dispatch = this._keyDispatch[this._mode][dispatch];
+                        }
+                        if (typeof dispatch == 'function') {
+                            proceed = dispatch.call(this, e);
+                        } else {
+                            var args = dispatch.slice(1);
+                            args.push(e);
+                            proceed = this[dispatch[0]].apply(this, args);
+                        }
+                        if (!proceed) {
+                            //console.warn('canceling ..')
+                            e.preventDefault();
+                        }
+                    }
+                }
+            },
+        }, CommonMixin, SelectedBrowsingMixin, AvailableDropdownMixin));
+    })();
+    </script>
+</polymer-element>
