@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>&lt;polymer-select-box&gt;</title>
+
+    <!-- Importing Web Component's Polyfill -->
+    <script src="bower_components/platform/platform.js"></script>
+
+    <!-- Importing Custom Elements -->
+    <link rel="import" href="src/polymer-select-box.html">
+    <style>
+        input, textarea {
+            border: 1px dashed #ddd;
+            border-radius: 2px;
+            display: block;
+            padding: 5px 8px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <input type="text">
+    <polymer-select-box id="unu"></polymer-select-box>
+    <textarea>Extra controls around for focus tests.</textarea>
+    <polymer-select-box id="doi"></polymer-select-box>
+    <input type="text">
+
+
+    <script>
+        window.addEventListener('polymer-ready', function() {
+            document.getElementById('unu').available = ["asdf", "wer", "lorem", "ipsum", "sil", "a", "b", "c" , "d"];
+            var choices = ["asdf", "wer", "lorem", "ipsum", "tetetete", "foobar"];
+            for (var i=0; i<200; i++) choices.push('stuff-'+i);
+            for (var i=0; i<200; i++) choices.push('asdf-'+i);
+            document.getElementById('doi').selected = [{label: 'asdf', value: 'asdf', query: 'it'}]
+            document.getElementById('doi').available = choices
+
+            document.getElementById('doi').focus();
+        });
+    </script>
+</body>
+</html>
