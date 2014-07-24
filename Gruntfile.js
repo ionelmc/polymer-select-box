@@ -5,6 +5,7 @@ module.exports = function(grunt) {
             demo: {
                 options: {
                     open: true,
+                    hostname: '127.0.0.1',
                     keepalive: true
                 }
             }
