@@ -185,8 +185,6 @@
     (function() {
         var CommonMixin = {
             _navigate: function(type, direction, start) {
-                console.info('_navigate', type, direction, start);
-
                 var pos = this[type+"FocusPos"], items = this[type];
                 if (pos === null) {
                     pos = start || -1;
@@ -384,14 +382,12 @@
                 }
             },
             _editQueryChanged: function(oldValue, newValue) {
-                //console.log(this._mode, oldValue, newValue)
                 if (this._mode == 'edit' && oldValue != newValue) {
                     this._updateAvailable(newValue);
                 }
             },
             _onFocusInput: function(e) {
                 if (!this.critical) {
-                    //console.info('_onFocusInput')
                     this._mode = 'add';
                     this.opened = true;
                     this.focused = true;
@@ -400,7 +396,6 @@
             },
             _onBlur: function(e) {
                 if (!this.critical) {
-                    //console.info('blur')
                     this._selectedFocus = null;
                     this._matchedFocus = null;
                     this.focused = false;
@@ -513,7 +508,6 @@
                 35: ['_navigateAvailable', 'last'],
             },
             _onKeydown: function(e) {
-                console.info(e.altGraphKey, e.metaKey, e.altKey, e.shiftKey, e.keyCode);
                 if (!e.altGraphKey && !e.metaKey && !e.altKey && !e.shiftKey) {
                     var proceed, dispatch = this._keyDispatch[this._mode][e.keyCode] || this._keyDispatch[e.keyCode];
                     if (dispatch) {
@@ -528,7 +522,6 @@
                             proceed = this[dispatch[0]].apply(this, args);
                         }
                         if (!proceed) {
-                            //console.warn('canceling ..')
                             e.preventDefault();
                         }
                     }
