@@ -1,11 +1,11 @@
 {
     "private": true,
     "devDependencies": {
-        "grunt": "latest",
-        "grunt-bump": "latest",
-        "grunt-cli": "latest",
-        "grunt-contrib-connect": "latest",
-        "grunt-gh-pages": "latest",
-        "grunt-text-replace": "latest"
+        "grunt": "*",
+        "grunt-bump": "*",
+        "grunt-cli": "*",
+        "grunt-contrib-connect": "*",
+        "grunt-gh-pages": "*",
+        "grunt-text-replace": "*"
     }
 }

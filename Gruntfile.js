@@ -40,7 +40,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-text-replace');
     grunt.loadNpmTasks('grunt-bump');
 
+    grunt.registerTask('default', ['build']);
     grunt.registerTask('build',  ['replace']);
     grunt.registerTask('deploy', ['gh-pages']);
     grunt.registerTask('server', ['connect']);
+    grunt.registerTask('release', ['build', 'deploy']);
 };
