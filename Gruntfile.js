@@ -1,6 +1,6 @@
 module.exports = function(grunt) {
     grunt.initConfig({
-        'connect': {
+        connect: {
             demo: {
                 options: {
                     open: true,
@@ -19,7 +19,7 @@ module.exports = function(grunt) {
                 'demo/*', 'src/*', 'index.html'
             ]
         },
-        'replace': {
+        replace: {
             example: {
                 src: ['src/*'],
                 dest: 'dist/',
@@ -29,10 +29,19 @@ module.exports = function(grunt) {
                 }]
             }
         },
-        'bump': {
+        bump: {
             options: {
                 files: ['bower.json'],
+                commitFiles: ['bower.json'],
                 pushTo: 'origin',
+            }
+        },
+        shell: {
+            register: {
+                command: 'bower register polymer-select-box git://github.com/ionelmc/polymer-select-box.git'
+            },
+            info: {
+                command: 'bower info polymer-select-box'
             }
         }
     });
@@ -40,10 +49,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-gh-pages');
     grunt.loadNpmTasks('grunt-text-replace');
     grunt.loadNpmTasks('grunt-bump');
+    grunt.loadNpmTasks('grunt-shell');
 
     grunt.registerTask('default', ['build']);
     grunt.registerTask('build',  ['replace']);
     grunt.registerTask('deploy', ['gh-pages']);
     grunt.registerTask('server', ['connect']);
-    grunt.registerTask('release', ['build', 'deploy']);
+    grunt.registerTask('register', ['shell:register']);
+    grunt.registerTask('release', ['build', 'deploy', 'bump', 'shell:info']);
 };
