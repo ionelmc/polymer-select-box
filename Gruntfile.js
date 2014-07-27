@@ -29,9 +29,10 @@ module.exports = function(grunt) {
                 }]
             }
         },
-        bump: {
+        'bump': {
             options: {
                 files: ['bower.json'],
+                pushTo: 'origin',
             }
         }
     });
