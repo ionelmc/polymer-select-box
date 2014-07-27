@@ -1,7 +1,7 @@
 {
     "name": "polymer-select-box",
-    "version": "0.0.0",
-    "description": "Polymer tagging widget webcomponent ",
+    "version": "0.1.0",
+    "description": "Polymer tagging widget webcomponent",
     "license": "MIT",
     "main": "dist/polymer-select-box.html",
     "keywords": [
@@ -14,6 +14,6 @@
         "bower_components"
     ],
     "dependencies": {
-        "polymer": "Polymer/polymer#~0.3.3"
+        "polymer": ">=0.3.3",
     }
 }
