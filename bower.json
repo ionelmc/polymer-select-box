@@ -10,6 +10,7 @@
     ],
     "ignore": [
         "**/.*",
+        "src",
         "node_modules",
         "bower_components",
         "*.komodoproject",
