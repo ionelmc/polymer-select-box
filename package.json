@@ -1,6 +1,7 @@
 {
     "private": true,
     "devDependencies": {
+        "bower": "*",
         "grunt": "*",
         "grunt-bump": "*",
         "grunt-cli": "*",
