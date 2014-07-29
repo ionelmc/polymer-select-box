@@ -23,6 +23,6 @@
         "README.md"
     ],
     "dependencies": {
-        "polymer": "*"
+        "polymer": "Polymer/polymer"
     }
 }
