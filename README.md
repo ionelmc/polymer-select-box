@@ -42,21 +42,10 @@ Or [download as ZIP](https://github.com/ionelmc/polymer-select-box/archive/maste
 
 ## Options
 
-Attribute     | Options     | Default      | Description
----           | ---         | ---          | ---
-`foo`         | *string*    | `bar`        | Lorem ipsum dolor.
-
-## Methods
-
-Method        | Parameters   | Returns     | Description
----           | ---          | ---         | ---
-`unicorn()`   | None.        | Nothing.    | Magic stuff appears.
-
-## Events
-
-Event         | Description
----           | ---
-`onsomething` | Triggers when something happens.
+Attribute     | Options             | Default      | Description
+---           | ---                 | ---          | ---
+`available`   | *list of strings*   | `[]`         | Lorem ipsum dolor.
+`selected`    | *list of strings*   | `[]`         | Lorem ipsum dolor.
 
 ## Development
 
