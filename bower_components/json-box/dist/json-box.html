@@ -1,0 +1,76 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../core-input/core-input.html">
+
+<polymer-element name="json-box" attributes="json">
+    <template>
+        <style>
+            core-input {
+                padding: 5px;
+                width: 100%;
+                font-family: monospace;
+                box-sizing: border-box;
+            }
+            .failed {
+                background: #fee;
+            }
+            .container {
+                border: 1px solid #ddd;
+                box-sizing: border-box;
+            }
+            .focused {
+                box-shadow: inset 0 0 3px #0074d9;
+                border: 1px solid #004080;
+            }
+            .error {
+                background: #f33;
+                color: #fff;
+                padding: 1ex;
+            }
+        </style>
+        <div class="container {{ {failed: failed, focused: focused} | tokenList }}">
+            <template if="{{ failed }}">
+                <div class="error">Failed to parse: {{ failed }}</div>
+            </template>
+            <core-input
+                id="input"
+                on-focus="{{ onFocus }}"
+                on-blur="{{ onBlur }}"
+                multiline
+                rows="{{ rows }}"
+                inputValue="{{ text }}"/>
+        </div>
+    </template>
+    <script>//<![CDATA[
+        Polymer({
+            publish: {rows: 1, indent: 0},
+            json: null,
+            text: "",
+            failed: false,
+            jsonChanged: function(_, val) {
+                this.text = JSON.stringify(val, null, Array(this.indent).join(' '));
+            },
+            textChanged: function(_, val) {
+                try {
+                    this.json = JSON.parse(val);
+                    this.failed = false;
+                } catch(e) {
+                    this.failed = e;
+                }
+            },
+            created: function() {
+                //this.addEventListener('focus', this.onFocus.bind(this), true);
+                //this.addEventListener('blur', this.onBlur.bind(this), true);
+                //this.$.input.addEventListener('focus', this.onFocus.bind(this), true);
+                //this.$.input.addEventListener('blur', this.onBlur.bind(this), true);
+            },
+            onFocus: function() {
+                console.log('focus')
+                this.focused = true;
+            },
+            onBlur: function() {
+                console.log('blue')
+                this.focused = false;
+            }
+        })
+    //]]></script>
+</polymer-element>

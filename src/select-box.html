@@ -1,6 +1,23 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<script type="text/javascript">
+    var SelectBoxUtils = {
+        breakBinding: function(func, marker) {
+            marker = marker || "dontBind";
+            return function() {
+                if (!this[marker]) {
+                    this[marker] = true;
+                    func.apply(this, arguments);
+                    Platform.flush();
+                    this.async(function() {
+                        this[marker] = false;
+                    });
+                }
+            }
+        }
+    };
+</script>
 
-<polymer-element name="polymer-select-box" constructor="PolymerSelectBox" tabindex="-1">
+<polymer-element name="select-box" tabindex="-1" attributes="available selected">
     <template>
         <style>
             :host {
@@ -13,7 +30,6 @@
                 flex-wrap: wrap;
                 align-items: center;
                 padding: 5px 8px;
-                margin: 5px;
                 position: relative;
                 outline: none;
             }
@@ -220,7 +236,7 @@
                         this[name + 'FocusPos'] = i;
                     }
                 }, this)
-            },
+            }
         };
         var SelectedBrowsingMixin = {
             _browseEliminateHighlighted: function() {
@@ -234,6 +250,7 @@
                     this._selectedFocus.value = this._matchedFocus.value;
                     this._selectedFocus.label = this._matchedFocus.label;
                     this._mode = 'browse';
+                    this._selectedChanged();
                 }
             },
             _navigateSelected: function(direction) {
@@ -305,28 +322,33 @@
 
             ////////////////////////////////////////
             /////////// PUBLIC INTERFACE ///////////
-            get available() {
-                return this._available;
-            },
-            set available(choices) {
-                this._available = choices.map(function(value, i) {
-                    if (typeof value == "string") {
-                        if (!value || !value.length) {
-                            throw "Can't accept falsy value in choices list. Item " + i + ": `" + value + "`";
+            availableChanged: function(oldValue, newValue) {
+                if (newValue) {
+                    this._available = newValue.map(function(value, i) {
+                        if (typeof value == "string") {
+                            if (!value || !value.length) {
+                                throw "Can't accept falsy value in choices list. Item " + i + ": `" + value + "`";
+                            }
+                            return {value: value, label: value};
+                        } else {
+                            return value;
                         }
-                        return {value: value, label: value};
-                    } else {
-                        return value;
-                    }
-                });
+                    });
+                } else {
+                    this._available = [];
+                }
                 this._filter(this._addQuery);
             },
-            get selected() {
-                return this._selected;
-            },
-            set selected(choices) {
-                this._selected = choices;
-            },
+            _selectedChanged: SelectBoxUtils.breakBinding(function() {
+                this.selected = this._selected.map(function(item) {
+                    return item.value;
+                });
+            }),
+            selectedChanged: SelectBoxUtils.breakBinding(function() {
+                this._selected = this.selected.map(function(value) {
+                    return {value: value, label: value, query: value};
+                });
+            }),
             ////////////////////////////////////////
 
             ////// event handlers //////
