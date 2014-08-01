@@ -2,6 +2,10 @@
 
 > Polymer tagging widget webcomponent
 
+## Status
+
+This is a work in progrees. You should consider the API and the internals unstable.
+
 ## Demo
 
 [Check it live!](http://ionelmc.github.io/polymer-select-box)

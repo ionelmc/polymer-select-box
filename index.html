@@ -23,7 +23,7 @@
         selected=
         <json-box rows="1" json="{{ selected }}"></json-box>
         The <code>&lt;select-box&gt;</code>:
-        <select-box id="box" available={{ available }} selected="{{ selected }}"></select-box>
+        <select-box id="box" available="{{ available }}" selected="{{ selected }}"></select-box>
 
     </template>
 
@@ -38,10 +38,11 @@
             var choices = ["asdf", "wer", "lorem", "ipsum", "tetetete", "foobar"];
             for (var i=0; i<500; i++) choices.push('stuff-'+i);
             for (var i=0; i<500; i++) choices.push('asdf-'+i);
-            other.selected = [{label: 'asdf', value: 'asdf', query: 'it'}]
+            other.selected = ['asdf']
             other.available = choices;
 
             result.available = ["asdf", "wer", "lorem", "ipsum", "sil", "a", "b", "c" , "d"];
+            result.selected = ['a'];
 
             other.focus();
         });

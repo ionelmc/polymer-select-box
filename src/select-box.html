@@ -250,6 +250,7 @@
                     this._selectedFocus.value = this._matchedFocus.value;
                     this._selectedFocus.label = this._matchedFocus.label;
                     this._mode = 'browse';
+                    this._selectedChanged();
                 }
             },
             _navigateSelected: function(direction) {
@@ -322,31 +323,38 @@
             ////////////////////////////////////////
             /////////// PUBLIC INTERFACE ///////////
             availableChanged: function(oldValue, newValue) {
-                this._available = choices.map(function(value, i) {
-                    if (typeof value == "string") {
-                        if (!value || !value.length) {
-                            throw "Can't accept falsy value in choices list. Item " + i + ": `" + value + "`";
+                if (newValue) {
+                    this._available = newValue.map(function(value, i) {
+                        if (typeof value == "string") {
+                            if (!value || !value.length) {
+                                throw "Can't accept falsy value in choices list. Item " + i + ": `" + value + "`";
+                            }
+                            return {value: value, label: value};
+                        } else {
+                            return value;
                         }
-                        return {value: value, label: value};
-                    } else {
-                        return value;
-                    }
-                });
+                    });
+                } else {
+                    this._available = [];
+                }
                 this._filter(this._addQuery);
             },
-            _selected SelectBoxUtils
-            get selected() {
-                return this._selected;
-            },
-            set selected(choices) {
-                this._selected = choices;
-            },
+            _selectedChanged: SelectBoxUtils.breakBinding(function() {
+                this.selected = this._selected.map(function(item) {
+                    return item.value;
+                });
+            }),
+            selectedChanged: SelectBoxUtils.breakBinding(function() {
+                this._selected = this.selected.map(function(value) {
+                    return {value: value, label: value, query: value};
+                });
+            }),
             ////////////////////////////////////////
 
             ////// event handlers //////
             created: function() {
-                this.selected = [];
-                this.available = [];
+                this._selected = [];
+                this._available = [];
                 this._mode = 'add';
             },
             attached: function() {
