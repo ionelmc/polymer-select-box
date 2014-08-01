@@ -1,6 +1,6 @@
-# &lt;polymer-select-box&gt;
+# &lt;select-box&gt;
 
-> Polymer tagging widget webcomponent 
+> Polymer tagging widget webcomponent
 
 ## Demo
 
@@ -11,7 +11,7 @@
 Install the component using [Bower](http://bower.io/):
 
 ```sh
-$ bower install polymer-select-box --save
+$ bower install select-box --save
 ```
 
 Or [download as ZIP](https://github.com/ionelmc/polymer-select-box/archive/master.zip).
@@ -27,13 +27,13 @@ Or [download as ZIP](https://github.com/ionelmc/polymer-select-box/archive/maste
 2. Import Custom Element:
 
     ```html
-    <link rel="import" href="bower_components/polymer-select-box/dist/polymer-select-box.html">
+    <link rel="import" href="bower_components/select-box/dist/select-box.html">
     ```
 
 3. Start using it!
 
     ```html
-    <polymer-select-box></polymer-select-box>
+    <select-box></select-box>
     ```
 
 ## Options
