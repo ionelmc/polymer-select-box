@@ -2,13 +2,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>&lt;polymer-select-box&gt;</title>
-
-    <!-- Importing Web Component's Polyfill -->
+    <title>&lt;select-box&gt;</title>
     <script src="bower_components/platform/platform.js"></script>
-
-    <!-- Importing Custom Elements -->
-    <link rel="import" href="src/polymer-select-box.html">
+    <link rel="import" href="src/select-box.html">
+    <link rel="import" href="bower_components/json-box/dist/json-box.html">
     <style>
         input, textarea {
             border: 1px dashed #ddd;
@@ -19,25 +16,34 @@
         }
     </style>
 </head>
-<body>
+<body unresolved>
+    <template id="result" is="auto-binding">
+        available=
+        <json-box rows="1" json="{{ available }}"></json-box>
+        selected=
+        <json-box rows="1" json="{{ selected }}"></json-box>
+        The <code>&lt;select-box&gt;</code>:
+        <select-box id="box" available={{ available }} selected="{{ selected }}"></select-box>
 
-    <input type="text">
-    <polymer-select-box id="unu"></polymer-select-box>
-    <textarea>Extra controls around for focus tests.</textarea>
-    <polymer-select-box id="doi"></polymer-select-box>
-    <input type="text">
+    </template>
 
+    <hr>
+    Example with lots of items:
+    <select-box id="other"></select-box>
 
     <script>
         window.addEventListener('polymer-ready', function() {
-            document.getElementById('unu').available = ["asdf", "wer", "lorem", "ipsum", "sil", "a", "b", "c" , "d"];
+            var result = document.getElementById('result'),
+                other = document.getElementById('other');
             var choices = ["asdf", "wer", "lorem", "ipsum", "tetetete", "foobar"];
-            for (var i=0; i<200; i++) choices.push('stuff-'+i);
-            for (var i=0; i<200; i++) choices.push('asdf-'+i);
-            document.getElementById('doi').selected = [{label: 'asdf', value: 'asdf', query: 'it'}]
-            document.getElementById('doi').available = choices
+            for (var i=0; i<500; i++) choices.push('stuff-'+i);
+            for (var i=0; i<500; i++) choices.push('asdf-'+i);
+            other.selected = [{label: 'asdf', value: 'asdf', query: 'it'}]
+            other.available = choices;
 
-            document.getElementById('doi').focus();
+            result.available = ["asdf", "wer", "lorem", "ipsum", "sil", "a", "b", "c" , "d"];
+
+            other.focus();
         });
     </script>
 </body>

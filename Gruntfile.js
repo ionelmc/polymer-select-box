@@ -11,11 +11,11 @@ module.exports = function(grunt) {
         },
         'gh-pages': {
             options: {
-                clone: 'bower_components/polymer-select-box'
+                clone: 'bower_components/select-box'
             },
             src: [
                 'bower_components/**/*',
-                '!bower_components/polymer-select-box/**/*',
+                '!bower_components/select-box/**/*',
                 'demo/*', 'src/*', 'index.html'
             ]
         },
@@ -38,10 +38,10 @@ module.exports = function(grunt) {
         },
         shell: {
             register: {
-                command: 'bower register polymer-select-box git://github.com/ionelmc/polymer-select-box.git'
+                command: 'bower register select-box git://github.com/ionelmc/polymer-select-box.git'
             },
             info: {
-                command: 'bower info polymer-select-box'
+                command: 'bower info select-box'
             }
         }
     });

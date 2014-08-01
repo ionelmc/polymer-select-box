@@ -1,9 +1,9 @@
 {
-    "name": "polymer-select-box",
+    "name": "select-box",
     "version": "1.0.4",
     "description": "Polymer tagging widget webcomponent",
     "license": "MIT",
-    "main": "dist/polymer-select-box.html",
+    "main": "dist/select-box.html",
     "keywords": [
         "polymer",
         "web-components"
@@ -24,5 +24,8 @@
     ],
     "dependencies": {
         "polymer": "Polymer/polymer"
+    },
+    "devDependencies": {
+        "json-box": "*"
     }
 }
