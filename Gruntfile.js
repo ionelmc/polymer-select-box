@@ -19,6 +19,17 @@ module.exports = function(grunt) {
                 'demo/*', 'src/*', 'index.html'
             ]
         },
+        gitcommit: {
+            task: {
+                options: {
+                    message: 'Update dist',
+                    noStatus: true
+                },
+                files: {
+                    src: ['dist']
+                }
+            }
+        },
         replace: {
             example: {
                 src: ['src/*'],
@@ -50,11 +61,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-text-replace');
     grunt.loadNpmTasks('grunt-bump');
     grunt.loadNpmTasks('grunt-shell');
+    grunt.loadNpmTasks('grunt-git');
 
     grunt.registerTask('default', ['build']);
     grunt.registerTask('build',  ['replace']);
     grunt.registerTask('deploy', ['gh-pages']);
     grunt.registerTask('server', ['connect']);
     grunt.registerTask('register', ['shell:register']);
-    grunt.registerTask('release', ['build', 'deploy', 'bump', 'shell:info']);
+    grunt.registerTask('release', ['build', 'gitcommit', 'deploy', 'bump', 'shell:info']);
 };
