@@ -4,6 +4,7 @@
         "bower": "*",
         "grunt": "*",
         "grunt-bump": "*",
+        "grunt-git": "*",
         "grunt-cli": "*",
         "grunt-contrib-connect": "*",
         "grunt-gh-pages": "*",
