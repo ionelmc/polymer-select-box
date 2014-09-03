@@ -1,6 +1,6 @@
 {
   "name": "json-box",
-  "version": "0.2.2",
+  "version": "1.0.1",
   "description": "Simple json editor widget webcomponent",
   "license": "MIT",
   "main": "dist/json-box.html",
