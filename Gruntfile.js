@@ -69,4 +69,6 @@ module.exports = function(grunt) {
     grunt.registerTask('server', ['connect']);
     grunt.registerTask('register', ['shell:register']);
     grunt.registerTask('release', ['build', 'gitcommit', 'deploy', 'bump', 'shell:info']);
+    grunt.registerTask('release-minor', ['build', 'gitcommit', 'deploy', 'bump:minor', 'shell:info']);
+    grunt.registerTask('release-major', ['build', 'gitcommit', 'deploy', 'bump:major', 'shell:info']);
 };
