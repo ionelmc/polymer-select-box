@@ -24,9 +24,14 @@
     Example with lots of items:
     <select-box id="other"></select-box>
 
+    <hr>
+    Lazy loading:
+    <select-box id="slow"></select-box>
+
     <script>
         window.addEventListener('polymer-ready', function() {
             var result = document.getElementById('result'),
+                slow = document.getElementById('slow'),
                 other = document.getElementById('other');
             var choices = ["asdf", "wer", "lorem", "ipsum", "tetetete", "foobar"];
             for (var i=0; i<500; i++) choices.push('stuff-'+i);
@@ -36,6 +41,13 @@
 
             result.available = ["asdf", "wer", "lorem", "ipsum", "sil", "a", "b", "c" , "d"];
             result.selected = ['a'];
+
+            slow.available = function (query, callback) {
+                setTimeout(function() {
+                    callback(["asdf", "wer", "lorem", "ipsum", "sil", "a", "b", "c" , "d"])
+                }, 500);
+            };
+            slow.selected = ['a'];
 
             other.focus();
         });
