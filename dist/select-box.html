@@ -99,8 +99,12 @@
             .choice:hover {
                 border: 1px solid #aaa;
             }
-            ._empty {
+            ._loading, ._empty {
                 padding: 5px;
+            }
+            ._loading {
+                background: 5px center no-repeat url("loading.gif");
+                padding-left: 28px;
             }
             .unmatched {
                 color: #e00;
@@ -192,7 +196,12 @@
                          on-mousedown="{{ _onClickAvailable }}">{{ c.label }}
                     </div>
                 </template>
-                <template if="{{ _empty }}">
+                <template if="{{ _loading }}">
+                    <div class="_loading">
+                        Loading choices ...
+                    </div>
+                </template>
+                <template if="{{ !_loading && _empty }}">
                     <div class="_empty">
                         No available choices.
                     </div>
@@ -241,6 +250,18 @@
                         this[name + 'FocusPos'] = i;
                     }
                 }, this)
+            },
+            _prepareAvailable: function(values) {
+                return values.map(function(value, i) {
+                    if (typeof value == "string") {
+                        if (!value || !value.length) {
+                            throw "Can't accept falsy value in choices list. Item " + i + ": `" + value + "`";
+                        }
+                        return {value: value, label: value};
+                    } else {
+                        return value;
+                    }
+                });
             }
         };
         var SelectedBrowsingMixin = {
@@ -274,11 +295,23 @@
                 return !query || !query.length || item.label.toString().indexOf(query) >= 0;
             },
             _filter: function(value) {
-                this._matched = this._available.filter(function(item) {
+                if (typeof this._available == "function") {
+                    this._loading = true;
+                    this._matched = [];
+                    this._available(value, function(data) {
+                        this._updateMatched(data, value);
+                    }.bind(this));
+                } else {
+                    this._updateMatched(this._available, value);
+                }
+            },
+            _updateMatched: function(data, value) {
+                this._matched = data.filter(function(item) {
                     item.highlighted = false;
                     return this._isAvailable(item) && this._isMatch(item, value);
                 }, this);
                 this._empty = !this._matched.length;
+                this._loading = false;
                 if (this._matched.length) {
                     this._matched[0].highlighted = true;
                 }
@@ -329,16 +362,16 @@
             /////////// PUBLIC INTERFACE ///////////
             availableChanged: function(oldValue, newValue) {
                 if (newValue) {
-                    this._available = newValue.map(function(value, i) {
-                        if (typeof value == "string") {
-                            if (!value || !value.length) {
-                                throw "Can't accept falsy value in choices list. Item " + i + ": `" + value + "`";
-                            }
-                            return {value: value, label: value};
-                        } else {
-                            return value;
-                        }
-                    });
+                    // TODO, check if newValue is function
+                    if (typeof newValue == 'function') {
+                        this._available = function(query, callback) {
+                            newValue(query, function(data) {
+                                callback(this._prepareAvailable(data))
+                            }.bind(this))
+                        }.bind(this);
+                    } else {
+                        this._available = this._prepareAvailable(newValue);
+                    }
                 } else {
                     this._available = [];
                 }
