@@ -1,6 +1,6 @@
 {
     "name": "select-box",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "description": "Polymer tagging widget webcomponent",
     "license": "MIT",
     "main": "dist/select-box.html",
