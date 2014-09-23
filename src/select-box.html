@@ -59,18 +59,21 @@
             #input[readonly] {
                 text-decoration: line-through;
             }
-            #available {
+            #available-wrapper {
                 position: absolute;
                 left: -1px;
                 right: -1px;
                 top: 100%;
+            }
+            #available {
+                position: relative;
                 border-top: none;
                 border-bottom-right-radius: 2px;
                 border-bottom-left-radius: 2px;
-                padding-top: 5px;
                 z-index: 1;
                 background: #fff;
                 max-height: 36ex;
+                max-height: 255px;
                 overflow-y: auto;
                 display: none;
             }
@@ -91,6 +94,7 @@
                 margin: 5px;
                 background: #fafafa;
                 cursor: pointer;
+                box-sizing: border-box;
             }
             .choice.highlighted {
                 border: 1px solid #bbb;
@@ -190,22 +194,24 @@
                    on-mousedown="{{ _onFocusInput }}"
                    on-focus="{{ _onFocusInput }}"
             >
-            <div id="available" tabindex="-1">
-                <template repeat="{{ c in _matched }}">
-                    <div class="choice {{ {highlighted: c.highlighted} | tokenList }}"
-                         on-mousedown="{{ _onClickAvailable }}">{{ c.label }}
-                    </div>
-                </template>
-                <template if="{{ _loading }}">
-                    <div class="_loading">
-                        Loading choices ...
-                    </div>
-                </template>
-                <template if="{{ !_loading && _empty }}">
-                    <div class="_empty">
-                        No available choices.
-                    </div>
-                </template>
+            <div id="available-wrapper" tabindex="-1">
+                <div id="available" tabindex="-1">
+                    <template repeat="{{ c in _matched }}">
+                        <div class="choice {{ {highlighted: c.highlighted} | tokenList }}"
+                             on-mousedown="{{ _onClickAvailable }}">{{ c.label }}
+                        </div>
+                    </template>
+                    <template if="{{ _loading }}">
+                        <div class="_loading">
+                            Loading choices ...
+                        </div>
+                    </template>
+                    <template if="{{ !_loading && _empty }}">
+                        <div class="_empty">
+                            No available choices.
+                        </div>
+                    </template>
+                </div>
             </div>
             <div id="opener" on-click="{{ onClickAvailableOpener }}">&#x25BC;</div>
         </div>
@@ -238,7 +244,7 @@
                 }
                 this[type+"Focus"] = items[pos];
                 if (pos) {
-                    return pos == items.length - 1 ? 1 : 0
+                    return items.length && pos == items.length - 1 ? 1 : 0
                 }  else {
                     return -1
                 }
@@ -324,7 +330,7 @@
                 if (this._mode == 'browse' && this._matched < 2)
                     return true;
                 this.opened = true;
-                this._scrollAvailable(this._navigate('_matched', direction), direction);
+                this.async(this._scrollAvailable, [this._navigate('_matched', direction), direction]);
             },
 
             _addItemToSelected: function(item) {
@@ -335,13 +341,21 @@
                 }
             },
             _scrollAvailable: function(boundary, direction) {
+                var highlighted = this.$.available.querySelector('.highlighted'),
+                    available = this.$.available,
+                    container = this.$.container;
                 if (!boundary) {
-                    var highlighted = this.$.available.querySelector('.highlighted');
                     if (highlighted) {
-                        highlighted.scrollIntoView(direction.indexOf('next') == 0);
+                        if (available.scrollTop > highlighted.offsetTop) {
+                            available.scrollTop = highlighted.offsetTop - available.clientHeight + highlighted.offsetHeight + parseInt(window.getComputedStyle(highlighted).marginTop);
+                        }
+                        else
+                        if (available.clientHeight + available.scrollTop < highlighted.offsetHeight + highlighted.offsetTop) {
+                            available.scrollTop = highlighted.offsetTop - parseInt(window.getComputedStyle(highlighted).marginTop);
+                        }
                     }
                 } else {
-                    this.$.available.scrollTop = boundary > 0 ? this.$.available.scrollHeight : 0;
+                    available.scrollTop = boundary > 0 ? this.$.available.scrollHeight : 0;
                 }
             },
         };
