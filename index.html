@@ -7,6 +7,9 @@
     <link rel="import" href="src/select-box.html">
     <link rel="import" href="bower_components/json-box/dist/json-box.html">
     <style>
+        .slack {
+            height: 5000px;
+        }
     </style>
 </head>
 <body unresolved>
@@ -27,6 +30,8 @@
     <hr>
     Lazy loading:
     <select-box id="slow"></select-box>
+
+    <div class="slack"></div>
 
     <script>
         window.addEventListener('polymer-ready', function() {
