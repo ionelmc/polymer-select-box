@@ -17,7 +17,7 @@
     };
 </script>
 
-<polymer-element name="select-box" tabindex="-1" attributes="available selected">
+<polymer-element name="select-box" tabindex="-1" attributes="available selected placeholder">
     <template>
         <style>
             :host {
@@ -187,7 +187,7 @@
          --></template>
             <input id="input"
                    type="text"
-                   placeholder="{{ _selected.length ? '' : 'Type here ...' }}"
+                   placeholder="{{ _selected.length ? '' : (placeholder ? placeholder : 'Type here ...')}}"
                    value="{{ _addQuery }}"
                    class="{{ {unmatched: query.length && _empty} | tokenList }}"
                    readonly?="{{ _mode != 'add' }}"
