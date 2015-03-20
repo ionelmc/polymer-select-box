@@ -184,7 +184,7 @@
                  --><template if="{{ !s.editing }}"><!--
                         -->{{ s.label }}<!--
                  --></template><!--
-                 --><core-icon id="arrow" icon="close" aria-label="arrow-drop-down" role="img" class="eliminate" on-mousedown="{{ _onClickEliminate }}"></core-icon><!--
+                 --><core-icon icon="close" class="eliminate " on-mousedown="{{ _onClickEliminate }}"></core-icon><!--
              --></div><!--
          --></template>
             <input id="input"
@@ -215,7 +215,7 @@
                     </template>
                 </div>
             </div>
-            <core-icon id="opener" icon="{{opened ? 'arrow-drop-up' : 'arrow-drop-down'}}" aria-label="arrow-drop-down" role="img" on-click="{{ onClickAvailableOpener }}"></core-icon>
+            <core-icon id="opener" icon="{{opened ? 'arrow-drop-up' : 'arrow-drop-down'}}" on-click="{{ onClickAvailableOpener }}"></core-icon>
         </div>
     </template>
 
