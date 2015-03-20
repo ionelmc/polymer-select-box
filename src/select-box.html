@@ -1,4 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-icon/core-icon.html">
+
 <script type="text/javascript">
     var SelectBoxUtils = {
         breakBinding: function(func, marker) {
@@ -182,7 +184,7 @@
                  --><template if="{{ !s.editing }}"><!--
                         -->{{ s.label }}<!--
                  --></template><!--
-                 --><a class="eliminate" on-mousedown="{{ _onClickEliminate }}">&#x274C;</a><!--
+                 --><core-icon id="arrow" icon="close" aria-label="arrow-drop-down" role="img" class="eliminate" on-mousedown="{{ _onClickEliminate }}"></core-icon><!--
              --></div><!--
          --></template>
             <input id="input"
@@ -213,7 +215,7 @@
                     </template>
                 </div>
             </div>
-            <div id="opener" on-click="{{ onClickAvailableOpener }}">&#x25BC;</div>
+            <core-icon id="opener" icon="{{opened ? 'arrow-drop-up' : 'arrow-drop-down'}}" aria-label="arrow-drop-down" role="img" on-click="{{ onClickAvailableOpener }}"></core-icon>
         </div>
     </template>
 
