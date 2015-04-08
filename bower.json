@@ -23,7 +23,8 @@
         "README.md"
     ],
     "dependencies": {
-        "polymer": "Polymer/polymer"
+        "polymer": "Polymer/polymer",
+        "core-icon": "Polymer/core-icon"
     },
     "devDependencies": {
         "json-box": "*"
